@@ -1,0 +1,73 @@
+version: "3.7"
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: "${PREFIX}-web"
+    working_dir: /src
+    ports:
+      - "${WEB_PORT:-8000}:80"
+    volumes:
+      - ./docker/nginx/server.conf:/etc/nginx/conf.d/default.conf
+      - "${BACKEND_PATH}:/src"
+    links:
+      - php
+      - postgres
+      - pgadmin
+      - mailhog
+
+  artisan:
+    build: docker/php/cli
+    entrypoint:
+      - php
+      - artisan
+    container_name: "${PREFIX}-artisan"
+    user: ${CURRENT_UID}
+    working_dir: /src
+    volumes:
+      - "${BACKEND_PATH}:/src"
+
+  phpunit:
+    build: docker/php/cli
+    entrypoint:
+      - vendor/bin/phpunit
+    container_name: "${PREFIX}-phpunit"
+    user: ${CURRENT_UID}
+    working_dir: /src
+    volumes:
+      - "${BACKEND_PATH}:/src"
+
+  php:
+    build: docker/php/fpm
+    container_name: "${PREFIX}-php"
+    working_dir: /src
+    user: ${CURRENT_UID}
+    volumes:
+      - "${BACKEND_PATH}:/src"
+      - ./docker/php/overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: "${PREFIX}-mailhog"
+    ports:
+      - "${MAILHOG_PORT:-8025}:8025"
+
+  postgres:
+    image: postgres:11-alpine
+    container_name: "${PREFIX}-postgres"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-example}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: ${POSTGRES_DB:-example}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  pgadmin:
+    container_name: "${PREFIX}_pgadmin"
+    image: dpage/pgadmin4:4.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - "${PGADMIN_PORT:-5051}:80"
+    restart: unless-stopped
