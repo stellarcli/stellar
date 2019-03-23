@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+export STELLAR_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+export CURRENT_UID=$(id -u):$(id -g)
+
+find_up () {
+  path=$(pwd)
+  while [[ "$path" != "" && ! -e "$path/$1" ]]; do
+    path=${path%/*}
+  done
+  echo "$path"
+}
+
+function init() {
+    
+    if [[ $# -gt 0 ]]; then
+        if [[ -f ".env.dc" ]]; then
+            export BACKEND_PATH="$( pwd -P)"
+        else
+            export BACKEND_PATH="$( find_up  .env.dc )"
+        fi
+        set -a
+            source "${BACKEND_PATH}/.env.dc"
+        set +a
+        start_command "${@}"
+    fi
+}
+
+function run_command() {
+  if [[ $# -gt 0 ]]; then
+    (cd ${STELLAR_PATH}  && $*)
+  fi
+}
+
+function dcr() {
+    run_command docker-compose run --rm  "${@}"
+}
+
+function start_command() {
+
+    if [[ ${1} == "init" ]]; then
+        run_command docker-compose build
+        run_command docker-compose up -d web
+        dcr artisan migrate:fresh --seed
+        dcr phpunit
+        exit 0
+    fi
+
+    if [[ "${1}" == "start" ]]; then
+        run_command docker-compose up -d web
+        exit 0
+    fi
+
+    if [[ "${1}" == "artisan" ]]; then
+        shift 1
+        dcr artisan "${@}"
+        exit 0
+    fi
+
+    if [[ "${1}" == "test" ]]; then
+        dcr  phpunit
+        exit 0
+    fi
+
+    docker-compose ${@}
+}
+
+init "${@}"
