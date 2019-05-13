@@ -10,58 +10,58 @@ find_up () {
   echo "$path"
 }
 
-function init() {
-    
+init() {
+    if [[ -f ".stellar-env" ]]; then
+        export BACKEND_PATH="$( pwd -P)"
+    else
+        export BACKEND_PATH="$( find_up  .stellar-env )"
+    fi
+    set -a
+        source "${BACKEND_PATH}/.stellar-env"
+    set +a
     if [[ $# -gt 0 ]]; then
-        if [[ -f ".env.dc" ]]; then
-            export BACKEND_PATH="$( pwd -P)"
-        else
-            export BACKEND_PATH="$( find_up  .env.dc )"
-        fi
-        set -a
-            source "${BACKEND_PATH}/.env.dc"
-        set +a
         start_command "${@}"
+    else
+        echo "init                 Init Stellar."
+        echo "start                Start Stellar."
+        echo "artisan              Pass through command to php artisan."
+        echo "test                 Run phpunit tests."
     fi
 }
 
-function run_command() {
-  if [[ $# -gt 0 ]]; then
-    (cd ${STELLAR_PATH}  && $*)
-  fi
-}
-
-function dcr() {
-    run_command docker-compose run --rm  "${@}"
-}
-
-function start_command() {
-
+start_command() {
     if [[ ${1} == "init" ]]; then
-        run_command docker-compose build
         run_command docker-compose up -d web
         dcr artisan migrate:fresh --seed
         dcr phpunit
-        exit 0
-    fi
-
-    if [[ "${1}" == "start" ]]; then
+    elif [[ "${1}" == "refresh" ]]; then
+        run_command docker-compose down
         run_command docker-compose up -d web
-        exit 0
-    fi
-
-    if [[ "${1}" == "artisan" ]]; then
+        dcr artisan migrate:refresh --seed
+        dcr phpunit
+    elif [[ "${1}" == "start" ]]; then
+        run_command docker-compose up -d web
+        dcr artisan migrate
+    elif [[ "${1}" == "artisan" ]]; then
         shift 1
         dcr artisan "${@}"
-        exit 0
+    elif [[ "${1}" == "test" ]]; then
+    shift 1
+        dcr  phpunit "${@}"
+    elif [[  $# -gt 0 ]]; then
+        run_command docker-compose "${@}"
     fi
+    exit 0
+}
 
-    if [[ "${1}" == "test" ]]; then
-        dcr  phpunit
-        exit 0
-    fi
+dcr() {
+    run_command docker-compose run --rm  "${@}"
+}
 
-    docker-compose ${@}
+run_command() {
+  if [[ $# -gt 0 ]]; then
+    (cd ${STELLAR_PATH}  && $*)
+  fi
 }
 
 init "${@}"
