@@ -10,20 +10,32 @@ find_up () {
   echo "$path"
 }
 
+container_list () {
+    echo "CONTAINERS:"
+    echo "web           ${PREFIX}_web"
+    echo "artisan       ${PREFIX}_artisan"
+    echo "phpunit       ${PREFIX}_phpunit"
+    echo "php           ${PREFIX}_php"
+    echo "mailhog       ${PREFIX}_mailhog"
+    echo "pgsql         ${PREFIX}_pgsql"
+    echo "pgadmin       ${PREFIX}_pgadmin"
+}
+
 init() {
-    if [[ -f ".stellar-env" ]]; then
+    if [[ -f ".stellar" ]]; then
         export BACKEND_PATH="$( pwd -P)"
     else
-        export BACKEND_PATH="$( find_up  .stellar-env )"
+        export BACKEND_PATH="$( find_up  .stellar )"
     fi
     set -a
-        source "${BACKEND_PATH}/.stellar-env"
+        source "${BACKEND_PATH}/.stellar"
     set +a
     if [[ $# -gt 0 ]]; then
         start_command "${@}"
     else
         echo "init                 Init Stellar."
         echo "start                Start Stellar."
+        echo "refresh              Refresh Stellar."
         echo "artisan              Pass through command to php artisan."
         echo "test                 Run phpunit tests."
     fi
@@ -32,22 +44,22 @@ init() {
 start_command() {
     if [[ ${1} == "init" ]]; then
         run_command docker-compose up -d web
-        dcr artisan migrate:fresh --seed
-        dcr phpunit
+        container_list
     elif [[ "${1}" == "refresh" ]]; then
         run_command docker-compose down
         run_command docker-compose up -d web
-        dcr artisan migrate:refresh --seed
-        dcr phpunit
+        container_list
     elif [[ "${1}" == "start" ]]; then
         run_command docker-compose up -d web
-        dcr artisan migrate
+        container_list
     elif [[ "${1}" == "artisan" ]]; then
         shift 1
         dcr artisan "${@}"
     elif [[ "${1}" == "test" ]]; then
-    shift 1
+        shift 1
         dcr  phpunit "${@}"
+    elif [[ "${1}" == "list" ]]; then
+        container_list
     elif [[  $# -gt 0 ]]; then
         run_command docker-compose "${@}"
     fi

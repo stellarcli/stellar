@@ -2,8 +2,8 @@ version: "3.7"
 
 services:
   web:
+    container_name: "${PREFIX}_web"
     image: nginx:alpine
-    container_name: "${PREFIX}-web"
     working_dir: /src
     ports:
       - "${WEB_PORT:-8000}:80"
@@ -12,34 +12,35 @@ services:
       - "${BACKEND_PATH}:/src"
     links:
       - php
+      - redis
       - postgres
       - pgadmin
       - mailhog
 
   artisan:
+    container_name: "${PREFIX}_artisan"
     build: docker/php/cli
     entrypoint:
       - php
       - artisan
-    container_name: "${PREFIX}-artisan"
     user: ${CURRENT_UID}
     working_dir: /src
     volumes:
       - "${BACKEND_PATH}:/src"
 
   phpunit:
+    container_name: "${PREFIX}_phpunit"
     build: docker/php/cli
     entrypoint:
       - vendor/bin/phpunit
-    container_name: "${PREFIX}-phpunit"
     user: ${CURRENT_UID}
     working_dir: /src
     volumes:
       - "${BACKEND_PATH}:/src"
 
   php:
+    container_name: "${PREFIX}_php"
     build: docker/php/fpm
-    container_name: "${PREFIX}-php"
     working_dir: /src
     user: ${CURRENT_UID}
     volumes:
@@ -47,14 +48,14 @@ services:
       - ./docker/php/overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
 
   mailhog:
+    container_name: "${PREFIX}_mailhog"
     image: mailhog/mailhog:latest
-    container_name: "${PREFIX}-mailhog"
     ports:
       - "${MAILHOG_PORT:-8025}:8025"
 
   postgres:
-    image: postgres:11-alpine
-    container_name: "${PREFIX}-postgres"
+    container_name: "${PREFIX}_pgsql"
+    image: mdillon/postgis
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -65,9 +66,13 @@ services:
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
 
+  redis:
+    container_name: "${PREFIX}_redis"
+    image: redis:alpine
+
   pgadmin:
     container_name: "${PREFIX}_pgadmin"
-    image: dpage/pgadmin4:4.3
+    image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
