@@ -19,7 +19,7 @@ add the stellar file to your path
 
 ## Setup
 
-create a .stellar-env file in your project:
+create a .stellar file in your project:
 
 ```
 PREFIX=myapp
