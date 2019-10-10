@@ -13,12 +13,17 @@ find_up () {
 container_list () {
     echo "CONTAINERS:"
     echo "web           ${PREFIX}_web"
+    echo "redis         ${PREFIX}_redis"
     echo "artisan       ${PREFIX}_artisan"
     echo "phpunit       ${PREFIX}_phpunit"
     echo "php           ${PREFIX}_php"
     echo "mailhog       ${PREFIX}_mailhog"
-    echo "pgsql         ${PREFIX}_pgsql"
-    echo "pgadmin       ${PREFIX}_pgadmin"
+    if [[ -z ${MYSQL_PORT} ]]; then
+        echo "pgsql         ${PREFIX}_pgsql"
+        echo "pgadmin       ${PREFIX}_pgadmin"
+    else
+        echo "mysql         ${PREFIX}_mysql"
+    fi
 }
 
 init() {

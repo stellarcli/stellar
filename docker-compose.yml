@@ -28,7 +28,9 @@ services:
       - "${BACKEND_PATH}:/src"
     links:
       - php
+      - redis
       - mysql
+      - mailhog
 
   artisan:
     container_name: "${PREFIX}_artisan"
