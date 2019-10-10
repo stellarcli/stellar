@@ -4,13 +4,13 @@ Basic local docker for Laravel.
 
 ## Whats in the box
 
-nginx
-php 7.3
-postgres 11
-mailhog
-mysql 5.7
-
-pgadmin4
+ - nginx
+ - php 7.3
+ - redis
+ - postgres 11
+    - pgadmin4
+ - mailhog
+ - mysql 5.7
 
 
 ## Installation
@@ -48,6 +48,8 @@ WEB_PORT=8000
 MYSQL_PORT=33060
 MYSQL_DATABASE=stellar
 MYSQL_PASSWORD=secret
+
+MAILHOG_PORT=8025
 ```
 
 run `stellar init`
