@@ -42,15 +42,22 @@ init() {
 }
 
 start_command() {
+
+    if [[ -z ${MYSQL_PORT} ]]; then
+        container='web'
+    else
+        container='web_mysql'
+    fi
+
     if [[ ${1} == "init" ]]; then
-        run_command docker-compose up -d web
+        run_command docker-compose up -d ${container}
         container_list
     elif [[ "${1}" == "refresh" ]]; then
         run_command docker-compose down
-        run_command docker-compose up -d web
+        run_command docker-compose up -d ${container}
         container_list
     elif [[ "${1}" == "start" ]]; then
-        run_command docker-compose up -d web
+        run_command docker-compose up -d ${container}
         container_list
     elif [[ "${1}" == "artisan" ]]; then
         shift 1
