@@ -59,7 +59,8 @@ start_command() {
         container_list
     elif [[ "${1}" == "refresh" ]]; then
         run_command docker-compose down
-        run_command docker-compose up -d ${container}
+        run_command docker-compose build --no-cache php phpunit artisan
+        run_command docker-compose up -d --force-recreate ${container}
         container_list
     elif [[ "${1}" == "start" ]]; then
         run_command docker-compose up -d ${container}

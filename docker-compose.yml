@@ -76,6 +76,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
       POSTGRES_DB: ${POSTGRES_DB:-stellar}
       POSTGRES_TEST_DB: ${POSTGRES_TEST_DB:-test}
+    restart: unless-stopped
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -87,8 +88,11 @@ services:
     ports:
      - "${MYSQL_PORT:-33060}:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-$secret}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      MYSQL_USER: ${MYSQL_USER:-stellar}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
       MYSQL_DATABASE: ${MYSQL_DB:-stellar}
+    restart: unless-stopped
 
   redis:
     container_name: "${PREFIX}_redis"

@@ -34,11 +34,13 @@ RUN apk add --no-cache --virtual .build-deps \
         mbstring \
         pdo \
         gd \
+        pdo_mysql \
         pdo_pgsql \
         pdo_sqlite \
         pcntl \
         tokenizer \
         xml \
+        soap \
         zip \
         intl \
     && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
