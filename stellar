@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export STELLAR_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 export CURRENT_UID=$(id -u):$(id -g)
-
+export COMPOSE_IGNORE_ORPHANS=true
 find_up () {
   path=$(pwd)
   while [[ "$path" != "" && ! -e "$path/$1" ]]; do
@@ -13,17 +13,14 @@ find_up () {
 container_list () {
     echo "CONTAINERS:"
     echo "web           ${PREFIX}_web"
-    echo "redis         ${PREFIX}_redis"
     echo "artisan       ${PREFIX}_artisan"
     echo "phpunit       ${PREFIX}_phpunit"
     echo "php           ${PREFIX}_php"
-    echo "mailhog       ${PREFIX}_mailhog"
-    if [[ -z ${MYSQL_PORT} ]]; then
-        echo "pgsql         ${PREFIX}_pgsql"
-        echo "pgadmin       ${PREFIX}_pgadmin"
-    else
-        echo "mysql         ${PREFIX}_mysql"
-    fi
+    echo "mailhog       stellar_mailhog"
+    echo "pgsql         stellar_pgsql"
+    echo "mysql         stellar_mysql"
+    echo "redis         stellar_redis"
+    echo "NETWORK: \nstellar_network"
 }
 
 init() {
@@ -39,6 +36,7 @@ init() {
         start_command "${@}"
     else
         echo "init                 Init Stellar."
+        echo "stop                 Stop Stellar."
         echo "start                Start Stellar."
         echo "refresh              Refresh Stellar."
         echo "artisan              Pass through command to php artisan."
@@ -48,22 +46,21 @@ init() {
 
 start_command() {
 
-    if [[ -z ${MYSQL_PORT} ]]; then
-        container='web'
-    else
-        container='web_mysql'
-    fi
 
     if [[ ${1} == "init" ]]; then
-        run_command docker-compose up -d ${container}
+        run_command docker-compose -f docker-compose.base.yml up -d
+        run_command docker-compose up -d web
         container_list
+    elif [[ ${1} == "stop" ]]; then
+        run_command docker-compose -f docker-compose.base.yml down
+        run_command docker-compose down
     elif [[ "${1}" == "refresh" ]]; then
         run_command docker-compose down
         run_command docker-compose build --no-cache php phpunit artisan
-        run_command docker-compose up -d --force-recreate ${container}
+        run_command docker-compose up -d --force-recreate web
         container_list
     elif [[ "${1}" == "start" ]]; then
-        run_command docker-compose up -d ${container}
+        run_command docker-compose up -d web
         container_list
     elif [[ "${1}" == "artisan" ]]; then
         shift 1
