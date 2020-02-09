@@ -49,7 +49,7 @@ start_command() {
 
     if [[ ${1} == "init" ]]; then
         run_command docker-compose -f docker-compose.base.yml up -d
-        run_command docker-compose up -d web
+        run_command docker-compose -p "${PREFIX}" up -d web
         container_list
     elif [[ ${1} == "stop" ]]; then
         run_command docker-compose -f docker-compose.base.yml down
@@ -57,10 +57,10 @@ start_command() {
     elif [[ "${1}" == "refresh" ]]; then
         run_command docker-compose down
         run_command docker-compose build --no-cache php phpunit artisan
-        run_command docker-compose up -d --force-recreate web
+        run_command docker-compose -p "${PREFIX}" up -d --force-recreate web
         container_list
     elif [[ "${1}" == "start" ]]; then
-        run_command docker-compose up -d web
+        run_command docker-compose -p "${PREFIX}" up -d web
         container_list
     elif [[ "${1}" == "artisan" ]]; then
         shift 1
