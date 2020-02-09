@@ -1,24 +1,24 @@
 # Stellar
 
-Basic local docker for PHP, optimized for Laravel.
+Basic Docker for PHP, optimized for Laravel. Stellar enables you to easily share your resource (Database / Redis / Mailhog) containers by defining a .stellar file in your projects directory, and starting the service by running `stellar start`.
 
 ## Whats in the box
 
-- nginx
-- php 7.3
-- redis
-- postgres 11
-- mailhog
-- mysql 5.7
+- `nginx`
+- `php 7.3`
+- `redis`
+- `postgres 11`
+- `mailhog`
+- `mysql 5.7`
 
 ## Installation
 
-clone the repo
-add the stellar file to your path
+ - clone the repo - `git clone git@github.com:willishq/stellar.git ~/.stellar`
+ - add stellar to your path - `export PATH=$HOME/.stellar:$PATH`
 
 ## Setup
 
-create a .stellar file in your project:
+create a `.stellar` file in the root of your project:
 
 ```
 PREFIX=myapp
