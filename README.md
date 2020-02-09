@@ -23,7 +23,6 @@ create a `.stellar` file in the root of your project:
 ```
 PREFIX=myapp
 WEB_PORT=8000
-
 ```
 
 run `stellar init`
