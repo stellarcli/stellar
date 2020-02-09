@@ -1,6 +1,6 @@
 # Stellar
 
-Basic local docker for Laravel.
+Basic local docker for PHP, optimized for Laravel.
 
 ## Whats in the box
 
@@ -27,3 +27,7 @@ WEB_PORT=8000
 ```
 
 run `stellar init`
+
+## Coming Soon
+
+ - Automatic database configuration
