@@ -28,6 +28,9 @@ WEB_PORT=8000
 
 run `stellar init`
 
+If you already have a project running with stellar, run `stellar start`
+
 ## Coming Soon
 
  - Automatic database configuration
+ - Web port clash detection / incrementation?
