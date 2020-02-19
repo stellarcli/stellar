@@ -20,7 +20,7 @@ container_list () {
     echo "pgsql         stellar_pgsql"
     echo "mysql         stellar_mysql"
     echo "redis         stellar_redis"
-    echo "NETWORK: \nstellar_network"
+    echo "NETWORK:      stellar_network"
 }
 
 init() {
@@ -62,6 +62,9 @@ start_command() {
     elif [[ "${1}" == "start" ]]; then
         run_command docker-compose -p "${PREFIX}" up -d web
         container_list
+    elif [[ "${1}" == "setup" ]]; then
+        docker exec -e DB_NAME="${DB_NAME}" -e DB_USERNAME="${DB_USERNAME}" -e DB_PASSWORD="${DB_PASSWORD}" stellar_mysql ./scripts/setup.sh
+        docker exec -e DB_NAME="${DB_NAME}" -e DB_USERNAME="${DB_USERNAME}" -e DB_PASSWORD="${DB_PASSWORD}" stellar_pgsql ./scripts/setup.sh
     elif [[ "${1}" == "artisan" ]]; then
         shift 1
         dcr artisan "${@}"
@@ -70,6 +73,9 @@ start_command() {
         dcr  phpunit "${@}"
     elif [[ "${1}" == "list" ]]; then
         container_list
+    elif [[ "${1}" == "destroyall" ]]; then
+      docker stop $(docker ps -a -q)
+      docker system prune --force
     elif [[  $# -gt 0 ]]; then
         run_command docker-compose "${@}"
     fi

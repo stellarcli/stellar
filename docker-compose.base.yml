@@ -15,18 +15,21 @@ services:
       POSTGRES_USER: stellar
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: stellar
-      POSTGRES_TEST_DB: test
     restart: unless-stopped
     ports:
       - "54320:5432"
     volumes:
-      - ./docker/postgres:/docker-entrypoint-initdb.d
+      - ./scripts/pgsql:/scripts/
+      - ./scripts/setup-pgsql.sh:/usr/local/bin/setup.sh
 
   mysql:
     container_name: "stellar_mysql"
-    image: mysql:5.7
+    image: mysql:8
     ports:
       - "33060:3306"
+    volumes:
+      - ./scripts/mysql:/scripts/
+      - ./docker/mysql:/etc/mysql/conf.d/
     environment:
       MYSQL_ROOT_PASSWORD: stellar
       MYSQL_USER: stellar
@@ -36,9 +39,10 @@ services:
 
   redis:
     container_name: "stellar_redis"
+    image: redis:alpine
     ports:
       - "63790:6379"
-    image: redis:alpine
+    restart: unless-stopped
 
 networks:
   default:
