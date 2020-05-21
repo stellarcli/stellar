@@ -35,6 +35,13 @@ DB_USERNAME=my_username
 DB_PASSWORD=my_password
 ```
 
+If you're using something like Laravel Valet but would still like to use the database, Redis and Mailhog services, you don't need to add the `PREFIX` or `WEB_PORT`, just the `DB_` variables. you can then use the services on the following ports:
+
+ - `mailhog: 10250`
+ - `postgres: 54320`
+ - `mysql: 33060`
+ - `redis: 63790`
+
 If you already have a project running with stellar, run `stellar start`
 
 ## Coming Soon
